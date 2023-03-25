@@ -121,9 +121,9 @@ namespace Solis
 
         private async Task Serialization()
         {
-            Console.WriteLine("Serializing");
+            Console.WriteLine("Serializing...");
 
-            await using var sw = new StreamWriter($@"C:\Users\Netty\Desktop\output-{DateTime.Now:s}.json");
+            await using var sw = new StreamWriter($@"{Environment.CurrentDirectory}/output-{DateTime.Now:s}.json");
             await using var jw = new JsonTextWriter(sw);
             JsonSerializer serializer = new();
 
