@@ -72,7 +72,7 @@ namespace Solis
 
         private async Task Deserialization()
         {
-            Console.WriteLine("DDeserializing...");
+            Console.WriteLine("Deserializing...");
             
             foreach (var chat in _files)
             {
@@ -123,7 +123,7 @@ namespace Solis
         {
             Console.WriteLine("Serializing...");
 
-            await using var sw = new StreamWriter($@"{Environment.CurrentDirectory}/output-{DateTime.Now:s}.json");
+            await using var sw = new StreamWriter($@"{Environment.CurrentDirectory}/output-{DateTime.Now:yyyy-MM-ddThh-mm-ss}.json");
             await using var jw = new JsonTextWriter(sw);
             JsonSerializer serializer = new();
 
