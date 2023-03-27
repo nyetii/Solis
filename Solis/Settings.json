@@ -1,0 +1,28 @@
+{
+  "filter": {
+    "url": true,
+    "codeBlocks": true,
+    "nullMessages": true,
+    "smallMessages": true,        // See "minChars"
+    "hugeMessages": true,         // See "maxChars"
+    "emotes": true,               // Only custom emotes
+    "specificWords": false        // See "specificWords" at "keyWords"
+  },
+  "replace": {
+    "pings": false,                // See "pingWords" and "pingReplacement" at "keyWords"
+    "mentions": false,             // See "mentionWords" and "mentionReplacement" at "keyWords"
+    "specificWords": false        // See "specificWords" and "specificReplacement" at "keyWords"
+  },
+  "limits": {
+    "minChars": 2,                // Default is 2
+    "maxChars": 2000              // Default is 2000 (non-nitro limit)
+  },
+  "keyWords": {
+    "pingWords": [],              // Matches @User, do not start with @
+    "pingReplacement": null,
+    "mentionWords": [],           // Matches anything
+    "mentionReplacement": null,
+    "specificWords": [],          // Matches anything
+    "specificReplacement": null
+  }
+}

@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics;
 using Newtonsoft.Json;
 using Solis.Output;
+using Solis.Filtering;
 
 namespace Solis
 {
     internal class Program
     {
+        private Settings? _settings;
         private Root? _deserialized = new();
         private readonly List<string> _files = new();
         private readonly List<Message> _list = new();
@@ -30,15 +32,20 @@ namespace Solis
             var elapsed2 = $"{stopwatch.Elapsed:hh\\:mm\\:ss}";
 
             stopwatch.Restart();
-            await Serialization();
+            await new FilterHandler(_dataset.dataset, _settings).FilterMessages();
             var elapsed3 = $"{stopwatch.Elapsed:hh\\:mm\\:ss}";
+
+            stopwatch.Restart();
+            await Serialization();
+            var elapsed4 = $"{stopwatch.Elapsed:hh\\:mm\\:ss}";
 
             stopwatch.Stop();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"Number of items in dataset: {_dataset.dataset.Count}");
             Console.WriteLine($"Deserialization elapsed: {elapsed1}");
             Console.WriteLine($"Sorting elapsed: {elapsed2}");
-            Console.WriteLine($"Serialization elapsed: {elapsed3}");
+            Console.WriteLine($"Filtering elapsed: {elapsed3}");
+            Console.WriteLine($"Serialization elapsed: {elapsed4}\n");
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Press any key to exit.");
@@ -48,6 +55,19 @@ namespace Solis
 
         private async Task Setup()
         {
+            using var sr = new StreamReader("Settings.json");
+            await using var reader = new JsonTextReader(sr);
+            var serializer = new JsonSerializer();
+
+            _settings = serializer.Deserialize<Settings>(reader);
+
+            sr.Dispose();
+            reader.Close();
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            if(_settings == null)
+                Console.WriteLine("Warning: Settings null, using default parameters.");
+
             Console.BackgroundColor = ConsoleColor.Gray;
             Console.ForegroundColor = ConsoleColor.Black;
             Console.Write("Provide the directory of the JSON files. Press");
@@ -73,7 +93,7 @@ namespace Solis
         private async Task Deserialization()
         {
             Console.WriteLine("Deserializing...");
-            
+
             foreach (var chat in _files)
             {
                 using var sr = new StreamReader(chat);
@@ -83,9 +103,11 @@ namespace Solis
                 _deserialized = serializer.Deserialize<Root>(reader);
 
                 if (_deserialized == null) continue;
+                
                 foreach (var item in _deserialized.messages.Where(item => item.type is "Default" or "Reply" && !item.author.isBot))
                     _list.Add(item);
             }
+            
 
             Console.WriteLine("Deserialization done!");
             await Task.CompletedTask;
@@ -129,7 +151,7 @@ namespace Solis
 
             jw.Formatting = Formatting.Indented;
 
-            serializer.Serialize(jw, _dataset);
+            serializer.Serialize(jw, _dataset.dataset);
 
             await sw.FlushAsync();
 
